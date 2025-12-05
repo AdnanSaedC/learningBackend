@@ -1,0 +1,8 @@
+look the client server arch looks like this there is a client which send request to the server and the server check the database and responds 
+
+what is a server a machine who job is to server nothing else
+
+js was a browser language but now we have extraced it separetely 
+ex node and bun (they are just run time environment)
+
+look when you play with other thing like bun you have to install that in the place where it runs because you cant run js script written for in bun
