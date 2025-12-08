@@ -1,0 +1,10 @@
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"DELETE\",\"url\":\"/delete/1\",\"status\":\"200\",\"responseTime\":\"3.616\"}","timestamp":"2025-12-05T18:49:05.324Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"//\",\"status\":\"404\",\"responseTime\":\"2.470\"}","timestamp":"2025-12-05T18:49:59.323Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/\",\"status\":\"404\",\"responseTime\":\"0.584\"}","timestamp":"2025-12-05T18:50:10.454Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/\",\"status\":\"200\",\"responseTime\":\"0.781\"}","timestamp":"2025-12-05T18:50:22.980Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/\",\"status\":\"200\",\"responseTime\":\"0.663\"}","timestamp":"2025-12-05T18:50:25.511Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/\",\"status\":\"200\",\"responseTime\":\"0.547\"}","timestamp":"2025-12-05T18:50:27.561Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/\",\"status\":\"200\",\"responseTime\":\"0.594\"}","timestamp":"2025-12-05T18:50:28.929Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/all/5\",\"status\":\"200\",\"responseTime\":\"0.601\"}","timestamp":"2025-12-05T18:50:47.130Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"//all/5\",\"status\":\"404\",\"responseTime\":\"0.400\"}","timestamp":"2025-12-05T18:51:02.859Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/all/3\",\"status\":\"200\",\"responseTime\":\"0.774\"}","timestamp":"2025-12-05T18:51:18.611Z"}
