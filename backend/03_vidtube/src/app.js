@@ -1,6 +1,8 @@
 import express from "express"
 import cors from "cors"
 import { router } from "./routes/healthcheck.route.js";
+import userRouter  from "./routes/user.route.js";
+import errorHandler from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -31,6 +33,9 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 //you can access them without any route
 app.use(express.static("public"))
 app.use("/api/v1/healthcheck",router);
+app.use("/api/v1/user",userRouter )
 
-
+//importing error handler
+//it is just to handle error better
+// app.use(errorHandler)
 export {app}
