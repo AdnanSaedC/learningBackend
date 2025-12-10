@@ -1,0 +1,4 @@
+mongodb allows bith prehooks and posthook
+
+prehooks things you want to do before saving something into database
+posthook after saving stuffs into the database

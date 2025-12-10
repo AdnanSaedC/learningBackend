@@ -6,3 +6,6 @@ js was a browser language but now we have extraced it separetely
 ex node and bun (they are just run time environment)
 
 look when you play with other thing like bun you have to install that in the place where it runs because you cant run js script written for in bun
+
+we are now insralling winston and morgan to create our own custom logs in express folder
+
