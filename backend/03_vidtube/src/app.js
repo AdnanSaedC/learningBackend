@@ -37,5 +37,5 @@ app.use("/api/v1/user",userRouter )
 
 //importing error handler
 //it is just to handle error better
-// app.use(errorHandler)
+app.use(errorHandler)
 export {app}
