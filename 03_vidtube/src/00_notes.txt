@@ -2,3 +2,40 @@ mongodb allows bith prehooks and posthook
 
 prehooks things you want to do before saving something into database
 posthook after saving stuffs into the database
+
+//aggregation pipeline
+pipeline is just stages and each stage performs some operration on the input data
+and the output of each stage is the input of the next stage
+
+[
+    {pipeline1},
+    {pipeline2},
+    {pipeline3},
+]
+
+//now each pipeline
+{
+    $opration:{}
+}
+
+example join opration in mongodb
+{
+    $lookup:{
+        foreigndbname:"teacher"
+        localid:"Tid"
+        foreignId:"EmpID"
+        nameOftheConnection:"relation between stu and techaer"
+
+        //refer the docs for correct syntax
+    }
+}
+here you will get the output in array to convert it into objcet
+{
+    $addfield:{
+        "connection":{
+            $first:nameOftheConnection
+            }
+    }
+}
+
+//in mongodb the field represent something which has both key and value pair
