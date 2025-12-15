@@ -20,7 +20,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
         //here we are considering the are watching the comments only after getting loged
     }
-    const comments= await Comment.aggregate([
+    const commentsPipeline= await Comment.aggregate([
         {
             $match:{
                 video:videoId
@@ -44,13 +44,27 @@ const getVideoComments = asyncHandler(async (req, res) => {
                 "isLiked":{
                     $cond:{
                         if:{
-                            $in:[userId,"$likes.likedBy"]
+                            $in:[userId,"$likes.likedBy"],
+                            then:true,
+                            else:false
                         }
                     }
                 }
             }
         }
     ])
+
+      const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+    };
+
+
+    //the result which we obtain can have one page and 10 comments maxon the page
+    const comments = await Comment.aggregatePaginate(
+        commentsPipeline,
+        options
+    );
 
     return res
         .status(200)

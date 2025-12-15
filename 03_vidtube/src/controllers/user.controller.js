@@ -358,12 +358,16 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
 const getUserDetails=asyncHandler(async(req,res)=>{
     const {username} = req.params
 
+    
+
     if(!username){
         throw new ApiError(400,"Username not available")
     }
 
     // look how aggregate function works is the output of one stage is input to next stage
     //but some $functions can increase the size of the document like $lookup and $unwind
+
+    //all the aggregation pipeline code goes directly no mongoose there 
     const channel = await User.aggregate([
         {
             $match:{
@@ -397,6 +401,7 @@ const getUserDetails=asyncHandler(async(req,res)=>{
                 //we are at particulart channel page now
                 subscriberOfThisChannelOrNot:{
                     $cond:{
+                        //req.user?._id this will give you a string but mongoose will convert it into a mongodb object
                         if: $in[req.user?._id,"$subscribers.subscriber"],
                         then:true,
                         else:false
@@ -435,7 +440,8 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
                 _id:new mongoose.Types.ObjectId(req.user?._id)
             }
         },
-        {
+        {   //the goal here is from user to videos abd get the creater name and we are limiting the creator details using project
+
             $lookup:{
                 //here we are linking the user and the videos
                 // here from is the forign db
@@ -461,10 +467,10 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
                             ]
                         }
                     },
-                    {
+                    { //what we are doing here is we are overwriting the owner field and giving the value direct to frontend rather than array
                         $addFields:{
                             owner:{
-                                $first:"owner"
+                                $first:"$owner"
                             }
                         }
                     }
