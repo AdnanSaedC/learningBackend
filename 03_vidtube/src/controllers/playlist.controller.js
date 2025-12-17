@@ -168,7 +168,6 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 })
 
 const updatePlaylist = asyncHandler(async (req, res) => {
-   const updatePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
     const userId = req?.user?._id
@@ -211,7 +210,6 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, updatedPlaylist, "Playlist updated successfully"))
-})
 
 })
 
