@@ -5,6 +5,7 @@ import { getUserDetails, loginUser,
         updateAccountDetails,
         updateAvatar,
         updateCoverImage,
+        getWatchHistory,
         updatePassword,
         userRegister } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -31,7 +32,7 @@ userRouter.route("/refresh-token").post(refreshAccessToken)
 
 // adding user to req
 userRouter.route("/logout").post(verifyJWT,logoutUser)
-userRouter.route("/logout").post(verifyJWT,logoutUser)
+userRouter.route("/login").post(verifyJWT,loginUser)
 userRouter.route("/change-password").post(verifyJWT,updatePassword)
 userRouter.route("/c/:username").post(verifyJWT,getUserDetails)
 userRouter.route("/update-account").post(verifyJWT,updateAccountDetails)

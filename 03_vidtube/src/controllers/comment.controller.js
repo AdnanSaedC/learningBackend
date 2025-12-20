@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import {Comment} from "../models/comment.model.js"
+import {Comment} from "../models/comment.models.js"
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js"
@@ -74,7 +74,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a 
-    const {comment , videoId, _id}= req.body
+    const {comment , videoId,}= req.body
+    const _id = req?.user?._id
     if(!comment || !videoId  || _id){
         throw new ApiError(400,"Comment and videoId are required")
     }
@@ -99,7 +100,8 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    const {_id,newContent,}=req.body
+    const {newContent,}=req.body
+    const _id = req?.user?._id
 
     if(!_id){
         throw new ApiError(400,"id was not found")
@@ -119,8 +121,8 @@ const updateComment = asyncHandler(async (req, res) => {
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
-    const {id}=req.body
-    if(!id){
+    const _id = req?.user?._id
+    if(!_id){
         throw new ApiError(400,"Id is required")
     }
 

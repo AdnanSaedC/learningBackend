@@ -3,6 +3,12 @@ import cors from "cors"
 import { router } from "./routes/healthcheck.route.js";
 import userRouter  from "./routes/user.route.js";
 import errorHandler from "./middlewares/error.middleware.js";
+import commentRouter from "./routes/comment.route.js";
+import likeRouter from "./routes/like.route.js";
+import playlistRouter from "./routes/playlist.route.js";
+import subscriptionRouter from "./routes/subscription.route.js";
+import tweetRouter from "./routes/tweet.route.js";
+import videoRouter from "./routes/video.route.js";
 
 const app = express();
 
@@ -34,6 +40,12 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.static("public"))
 app.use("/api/v1/healthcheck",router);
 app.use("/api/v1/user",userRouter )
+app.use("/api/v1/comments",commentRouter)
+app.use("/api/v1/likes",likeRouter)
+app.use("/api/v1/playlist",playlistRouter)
+app.use("/api/v1/subscription",subscriptionRouter)
+app.use("/api/v1/tweet",tweetRouter)
+app.use("/api/v1/video",videoRouter)
 
 //importing error handler
 //it is just to handle error better

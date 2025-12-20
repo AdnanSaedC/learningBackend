@@ -1,7 +1,7 @@
 import mongoose, {isValidObjectId} from "mongoose"
-import {Like} from "../models/like.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
+import {Like} from "../models/like.models.js"
+import {ApiError} from "../utils/apiError.js"
+import {ApiResponse} from "../utils/apiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
@@ -46,8 +46,15 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
     //TODO: toggle like on comment
 
+    const {userId} = req?.user?._id
+
+    if(!commentId || userId){
+        throw new ApiError(400,"comment or userId not found not found")
+    }
+
      const existingLike = await Like.findOne({
-        comment:commentId
+        comment:commentId,
+        likedBy:userId
     })
     
     if(existingLike){
@@ -76,8 +83,17 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
     //TODO: toggle like on tweet
+
+    const {userId} = req?.user?._id
+    //TODO: toggle like on video
+
+    if(!tweetId || userId){
+        throw new ApiError(400,"tweet or userId not found not found")
+    }
+
       const existingLike = await Like.findOne({
-        tweet:tweetId
+        tweet:tweetId,
+        owner:_id
     })
     
     if(existingLike){

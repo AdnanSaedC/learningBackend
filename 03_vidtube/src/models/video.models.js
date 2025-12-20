@@ -6,6 +6,9 @@ const videoSchema = new Schema({
         type:String,
         required:true,
     },
+    videoPublicId:{
+        type:String
+    },
     thumbnail:{
         type:String,
         required:true,

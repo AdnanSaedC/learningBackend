@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 import { User } from "../models/user.models.js";
 import { uploadOnClaudinary , deleteFromCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken"
@@ -85,11 +85,13 @@ try {
             throw new ApiError(400, "Avatar file is required")
         }
        
-    
+        console.log(avatar)
         const user = await User.create({
             fullName,
             avatar: avatar.url,
+            avatarPublicId:avatar?.public_id,
             coverImage: coverImage?.url || "",
+            coverImagePublicId:coverImage?.public_id,
             email, 
             password,
             username: username.toLowerCase()
@@ -298,7 +300,7 @@ const updateAccountDetails=asyncHandler(async(req,res)=>{
 
     return res
         .status(200)
-        .json(new ApiResponse(200,"Fields got updated"))
+        .json(new ApiResponse(200,user,"Fields got updated"))
 })
 const updateAvatar=asyncHandler(async(req,res)=>{
     const avatarLocalPath = req.files?.path
@@ -311,7 +313,14 @@ const updateAvatar=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"Failed to get url from the cloudinary")
     }
 
-    const user = User.findByIdAndUpdate(
+    let avatarPublicId =await User.findById(req.user?._id)
+    if(!avatarPublicId){
+        throw new ApiError(400,"wrongb user id")
+    }
+
+    await deleteFromCloudinary(avatarPublicId.avatarPublicId)
+
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -337,6 +346,13 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
     if(!coverImage?.url){
         throw new ApiError(400,"Failed to get url from the cloudinary")
     }
+
+    let coverImagePublicId =await User.findById(req.user?._id)
+    if(!coverImagePublicId){
+        throw new ApiError(400,"wrongb user id")
+    }
+
+    await deleteFromCloudinary(coverImagePublicId.coverImagePublicId)
 
     const user = User.findByIdAndUpdate(
         req.user?._id,
