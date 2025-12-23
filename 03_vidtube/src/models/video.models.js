@@ -13,6 +13,9 @@ const videoSchema = new Schema({
         type:String,
         required:true,
     },
+    thumbnailPublicId:{
+        type:String
+    },
     description:{
         type:String,
         required:true,

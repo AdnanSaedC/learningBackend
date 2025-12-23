@@ -40,9 +40,11 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
         throw new ApiError(400,"User is was not found")
     }
 
-    const playlist= await Playlist.find({
-        owner:userId
-    })
+    const playlist= await Playlist.aggregate([{
+        $match:{
+             owner:new mongoose.Types.ObjectId(userId)
+        }
+    }])
 
     if(playlist.length === 0){
         return res

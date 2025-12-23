@@ -9,6 +9,9 @@ import playlistRouter from "./routes/playlist.route.js";
 import subscriptionRouter from "./routes/subscription.route.js";
 import tweetRouter from "./routes/tweet.route.js";
 import videoRouter from "./routes/video.route.js";
+import { upload } from "./middlewares/multer.middleware.js";
+import cookieParser from "cookie-parser"
+import dashboardRouter from "./routes/dashboard.route.js";
 
 const app = express();
 
@@ -38,6 +41,11 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 //this means there are certain things which is same for all users
 //you can access them without any route
 app.use(express.static("public"))
+
+
+//to read cookies
+app.use(cookieParser())
+
 app.use("/api/v1/healthcheck",router);
 app.use("/api/v1/user",userRouter )
 app.use("/api/v1/comments",commentRouter)
@@ -45,9 +53,11 @@ app.use("/api/v1/likes",likeRouter)
 app.use("/api/v1/playlist",playlistRouter)
 app.use("/api/v1/subscription",subscriptionRouter)
 app.use("/api/v1/tweet",tweetRouter)
+app.use("/api/v1/dashboard",dashboardRouter)
+
 app.use("/api/v1/video",videoRouter)
 
 //importing error handler
 //it is just to handle error better
-app.use(errorHandler)
+
 export {app}

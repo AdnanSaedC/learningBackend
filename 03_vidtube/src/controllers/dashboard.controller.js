@@ -15,7 +15,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const channelObjectId = new mongoose.Types.ObjectId(channelId)
 
     //totalviews
-    const totalViews = await Video.aggregate([
+    const viewsStat = await Video.aggregate([
         {
             $match:{
                 owner:channelObjectId
@@ -30,7 +30,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
         }
     ])
 
-    const totalSubscribers = await Subscription.aggregate([
+    const subscriberStats = await Subscription.aggregate([
         {
             $match:{
                 channel:channelObjectId
@@ -73,8 +73,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
     ])
 
      const responseObject = {
-        totalViews: totalViews[0]?.totalViews || 0,
-        totalVideos: totalSubscribers[0]?.totalVideos || 0,
+        totalViews: viewsStat[0]?.totalViews || 0,
+        totalVideos: subscriberStats[0]?.totalVideos || 0,
         totalLikes: likeStats[0]?.totalLikes || 0,
         totalSubscribers: subscriberStats[0]?.totalSubscribers || 0
     }

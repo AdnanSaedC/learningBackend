@@ -11,8 +11,7 @@ const verifyJWT = asyncHandler(async(req,res,next)=>{
     }
 
     //THE TOKEN WE HAVE CONTAINS USER IN ENCRYPTED FORM
-    try {
-        const decodedToken = await jwt.verify(token,process.env.REFRESH_TOKEN_SECRET)
+        const decodedToken = await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
         if(!decodedToken){
             throw new ApiError(400,"improper access token")
         }
@@ -25,9 +24,6 @@ const verifyJWT = asyncHandler(async(req,res,next)=>{
     
         req.user = user;
         next()
-    } catch (error) {
-        throw new ApiError(400,error?.message || "Unable to process or can't able tom find user")
-    }
 
     
 })

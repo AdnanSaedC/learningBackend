@@ -1,9 +1,9 @@
-import mongoose, {isValidObjectId} from "mongoose"
+import mongoose, {isValidObjectId, mongo} from "mongoose"
 import {Video} from "../models/video.models.js"
 import {ApiError} from "../utils/apiError.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import {uploadOnClaudinary} from "../utils/cloudinary.js"
+import {deleteFromCloudinary, uploadOnClaudinary} from "../utils/cloudinary.js"
 
 
 
@@ -23,10 +23,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
         pipeline.push(
             {
                 $search:{
-                    index:'default',
+                    index:"yt",
                     text:{
                         query:query,
-                        path:'description'
+                        path:"description"
                     }
                 }
             }
@@ -75,7 +75,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     // TODO: get video, upload to cloudinary, create video
     const {  description} = req.body
-    const videoLocalPath = req.files?.path
+    const videoLocalPath = req.files?.videoFile[0].path
+    const thumbnailLocalPath = req.files?.thumbnailFile[0].path
     const user = req?.user?._id
 
     if(!user){
@@ -84,16 +85,24 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
     
     const videoLink = await uploadOnClaudinary(videoLocalPath)
-    if(!videoLink?.url){
-        throw new ApiError(400,"fail to get video link")
+    const thumbnailLink = await uploadOnClaudinary(thumbnailLocalPath)
+    if(!videoLink?.url && thumbnailLink?.url){
+        throw new ApiError(400,"fail to get video link or thumbnail link")
+    }
+    if(!videoLink?.public_id){
+        throw new ApiError(400,"Fail to get public id from video")
+    }
+    if(!thumbnailLink?.public_id){
+        throw new ApiError(400,"Fail to get public id from video")
     }
 
     const video = await Video.create({
-        videoFile:videoLink.url,
-        description:description,
-        owner:user,
-        thumbnail:videoLink.thumbnail || " ",
-        duration:videoLink.duration || 0
+        "videoFile":videoLink.url,
+        "videoPublicId":videoLink.public_id,
+        "description":description,
+        "owner":user,
+        "thumbnail":thumbnailLink.url || " ",
+        "duration":videoLink.duration || 0
     })
 
     if(!video){
@@ -128,12 +137,54 @@ const updateVideo = asyncHandler(async (req, res) => {
     //TODO: update video details like title, description, thumbnail
     const { videoId } = req.params
     const user = req?.user?._id
-    const {description,thumbnail} = req.body
+    const {description} = req.body
 
     if(!videoId || !user){
         throw new ApiError(400,"videoId or user is missing")
     }
+
+    const thumbnailLocalPath = req.files?.videoFile[0].path;
+    console.log(req.files?.videoFile[0].path)
+    console.log(thumbnailLocalPath)
+    if(!thumbnailLocalPath){
+        throw new ApiError(400,"fail to get video local path")
+    }
+
+
+    const thumbnail = await uploadOnClaudinary(thumbnailLocalPath);
+    if(!thumbnail?.url && !thumbnail?.public_id){
+        throw new ApiError(400,"Failed to upload on cloudinary")
+    }
+
+    const oldVideoData = await Video.findOne({
+        "videoPublicId":videoId,
+        "owner":user
+    });
+
+    if(oldVideoData){
+        throw new ApiError(400,"fail to get video or unauthorized")
+    }
+
+    const newVideo = await Video.findByIdAndUpdate(
+        {_id:videoId},
+        {
+            $set:{
+                thumbnail:thumbnail.url,
+                thumbnailPublicId:thumbnail.public_id
+            }
+        },
+        {
+            new:true
+        }
+    )
     
+    if(!newVideo){
+        throw new ApiError(400,"fail to update video")
+    }
+
+    return res
+            .status(200)
+            .json(200,newVideo,"updated successfully")
 
 })
 
@@ -146,7 +197,15 @@ const deleteVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400,"videoId or user is missing")
     }
 
-    const video = await Video.findOneAndDelete({
+    
+    let video = await Video.findOne({
+        owner:user,
+        _id:videoId
+    })
+    
+    await deleteFromCloudinary(video.videoPublic_id)
+
+     video = await Video.findOneAndDelete({
         owner:user,
         _id:videoId
     })

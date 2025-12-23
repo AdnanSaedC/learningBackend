@@ -27,16 +27,32 @@ userRouter.route("/register").post(
         }
     ]),
     userRegister)
-userRouter.route("/login").post(loginUser)
-userRouter.route("/refresh-token").post(refreshAccessToken)
+userRouter.route("/avatar").post(verifyJWT,
+    upload.fields([
+        {
+            name:"avatar",
+            maxCount:1
+        },
+    ]),
+    updateAvatar)
+userRouter.route("/cover-image").post(verifyJWT,
+    upload.fields([
+        {
+            name:"coverImage",
+            maxCount:1
+        },
+    ]),updateCoverImage)
+
+//this is beacause the xpress cant able to read multipart form data
+// if you got the error
+// upload.none()
+userRouter.route("/login").post(upload.none(),loginUser)
+userRouter.route("/refresh-token").post(upload.none(),refreshAccessToken)
 
 // adding user to req
-userRouter.route("/logout").post(verifyJWT,logoutUser)
-userRouter.route("/login").post(verifyJWT,loginUser)
-userRouter.route("/change-password").post(verifyJWT,updatePassword)
-userRouter.route("/c/:username").post(verifyJWT,getUserDetails)
+userRouter.route("/logout").post(verifyJWT,upload.none(),logoutUser)
+userRouter.route("/change-password").post(verifyJWT,upload.none(),updatePassword)
+userRouter.route("/c/:username").post(verifyJWT,upload.none(),getUserDetails)
 userRouter.route("/update-account").post(verifyJWT,updateAccountDetails)
-userRouter.route("/avatar").post(verifyJWT,upload.single("avatar"),updateAvatar)
-userRouter.route("/cover-image").post(verifyJWT,upload.single("coverImage"),updateCoverImage)
 userRouter.route("/history").get(verifyJWT,getWatchHistory)
 export default userRouter;

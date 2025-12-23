@@ -85,7 +85,7 @@ try {
             throw new ApiError(400, "Avatar file is required")
         }
        
-        console.log(avatar)
+        
         const user = await User.create({
             fullName,
             avatar: avatar.url,
@@ -126,6 +126,7 @@ try {
 const loginUser = asyncHandler(async (req,res)=>{
     const {email,password,username}=req.body
 
+
     if(!email){
         throw new ApiError(400,"Email is required");
     }
@@ -146,7 +147,8 @@ const loginUser = asyncHandler(async (req,res)=>{
 
     const {accessToken,refreshToken}= await generateAccessTokenAndRefreshToken(user._id);
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+    const loggedInUser = await User.findById(user._id).select("-password ");
+
 
 
     //here what it means is only serevr can modify the cookie not browser of js
@@ -159,7 +161,7 @@ const loginUser = asyncHandler(async (req,res)=>{
     res
         .status(200)
         .cookie("accessToken",accessToken,options)
-        .cookie("refreshToken",refrshToken,options)
+        .cookie("refreshToken",refreshToken,options)
         .json(new ApiResponse(
             200,
             {user:loggedInUser,
@@ -172,21 +174,23 @@ const loginUser = asyncHandler(async (req,res)=>{
 
 const refreshAccessToken=asyncHandler(async(req,res)=>{
     //get the refresh token from the user to generate access token
-
-    const currentRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+    const currentRefreshToken = (req.cookies.refreshToken) || (req.body.refreshToken)
     if(!currentRefreshToken){
         throw new ApiError(401,"No refresh token provided")
     }
-    try {
-            //lets verify the token
-            const decodedToken = await jwt.verify(currentRefreshToken,process.env.REFRESH_TOKEN_SECRET)
-            
-            //decoded token has userID
-            const user = User.findById(decodedToken?._id)
-            if(!user){
-                throw new ApiError(401,"Invalid refresh token")
-            }
-            
+        //lets verify the token
+        const decodedToken = await jwt.verify(currentRefreshToken,process.env.REFRESH_TOKEN_SECRET)
+        
+        //decoded token has userID
+        if(!decodedToken._id){
+            throw new ApiError(400,"wrong access token since no id")
+        }
+
+      
+        const user =await User.findById(decodedToken._id).select("-password")
+        if(!user){
+            throw new ApiError(401,"Invalid refresh token")
+        }
             if(currentRefreshToken!==user.refreshToken){
                 throw new ApiError(401,"Invalid refresh token or wrong token")
             }
@@ -209,12 +213,11 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
                     },
                     "Access token got updated"
                 )
-    } catch (error) {
-            throw new ApiError(500,"Error is refreshing access token")
-    }
+    
 })
 
 const logoutUser=asyncHandler(async(req,res)=>{
+    console.log("hhhhhh")
     //the flow here is we are going to make a middle ware which is going to check whether the user is valid and have valid access token or not 
     // when the req comes here we will extract the id and then logout the user
 
@@ -303,7 +306,14 @@ const updateAccountDetails=asyncHandler(async(req,res)=>{
         .json(new ApiResponse(200,user,"Fields got updated"))
 })
 const updateAvatar=asyncHandler(async(req,res)=>{
-    const avatarLocalPath = req.files?.path
+    
+    console.log('All fields sent:', Object.keys(req.body), Object.keys(req.files || {}));
+    
+    
+
+    const avatarLocalPath =  req.files.avatar[0].path
+    console.log(req.files.avatar[0].path)
+
     if(!avatarLocalPath){
         throw new ApiError(400,"avatar image is required")
     }
@@ -313,12 +323,12 @@ const updateAvatar=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"Failed to get url from the cloudinary")
     }
 
-    let avatarPublicId =await User.findById(req.user?._id)
-    if(!avatarPublicId){
+    let userOldData =await User.findById(req.user?._id)
+    if(!userOldData){
         throw new ApiError(400,"wrongb user id")
     }
 
-    await deleteFromCloudinary(avatarPublicId.avatarPublicId)
+    await deleteFromCloudinary(userOldData.avatarPublicId)
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -337,24 +347,31 @@ const updateAvatar=asyncHandler(async(req,res)=>{
             .json(new ApiResponse(200,user,"avatar image got updated"))
 })
 const updateCoverImage=asyncHandler(async(req,res)=>{
-    const coverImageLocalPath = req.files?.path
+    
+    console.log('All fields sent:', Object.keys(req.body), Object.keys(req.files || {}));
+    
+    
+
+    const coverImageLocalPath =  req.files.coverImage[0].path
+    console.log(req.files.coverImage[0].path)
+
     if(!coverImageLocalPath){
-        throw new ApiError(400,"cover image is required")
+        throw new ApiError(400,"avatar image is required")
     }
 
-    const coverImage = await uploadOnClaudinary(avatarLocalPath);
+    const coverImage = await uploadOnClaudinary(coverImageLocalPath);
     if(!coverImage?.url){
         throw new ApiError(400,"Failed to get url from the cloudinary")
     }
 
-    let coverImagePublicId =await User.findById(req.user?._id)
-    if(!coverImagePublicId){
+    let userOldData =await User.findById(req.user?._id)
+    if(!userOldData){
         throw new ApiError(400,"wrongb user id")
     }
 
-    await deleteFromCloudinary(coverImagePublicId.coverImagePublicId)
+    await deleteFromCloudinary(userOldData.avatarPublicId)
 
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -368,8 +385,44 @@ const updateCoverImage=asyncHandler(async(req,res)=>{
 
     return res
             .status(200)
-            .json(new ApiResponse(200,user,"Cover image got updated"))
+            .json(new ApiResponse(200,user,"avatar image got updated"))
 })
+
+// const updateCoverImage=asyncHandler(async(req,res)=>{
+
+//     const coverImageLocalPath = req.files?.coverImage[0].path
+//     if(!coverImageLocalPath){
+//         throw new ApiError(400,"cover image is required")
+//     }
+
+//     const coverImage = await uploadOnClaudinary(coverImageLocalPath);
+//     if(!coverImage?.url){
+//         throw new ApiError(400,"Failed to get url from the cloudinary")
+//     }
+
+//     let userOldData =await User.findById(req.user?._id)
+//     if(!userOldData){
+//         throw new ApiError(400,"wrongb user id")
+//     }
+
+//     await deleteFromCloudinary(userOldData.coverImagePublicId)
+
+//     const user = User.findByIdAndUpdate(
+//         req.user?._id,
+//         {
+//             $set:{
+//                 coverImage:coverImage.url
+//             }
+//         },
+//         {
+//             new:true
+//         }
+//     ).select("-password -refreshToken")
+
+//     return res
+//             .status(200)
+//             .json(new ApiResponse(200,user,"Cover image got updated"))
+// })
 
 const getUserDetails=asyncHandler(async(req,res)=>{
     const {username} = req.params
@@ -418,7 +471,11 @@ const getUserDetails=asyncHandler(async(req,res)=>{
                 subscriberOfThisChannelOrNot:{
                     $cond:{
                         //req.user?._id this will give you a string but mongoose will convert it into a mongodb object
-                        if: $in[req.user?._id,"$subscribers.subscriber"],
+                        if: {
+                                $in:[req.user?._id,
+                                    {$ifNull:["$subscribers.subscriber",[]]}
+                                    ]
+                            },
                         then:true,
                         else:false
                     }
