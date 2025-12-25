@@ -1,0 +1,223 @@
+what is mongoDB it is not only sql mongoDB
+format is bson binary js object notation
+
+document -> becomes collection which becomes database
+
+in order to use the sheel
+open the exe and then type mongosh
+
+to clear cls
+to exit exit
+
+in order to use the sheel through vscode install mongoDB ext.
+click on right click and open sheel
+
+show dbs 
+
+use dbName
+
+use newDbName to create one
+it will only show up when you have some collectionin that
+
+db.dropDatabase()
+
+to create collection
+db.createCollection("")
+
+if collection(here students) is not there then it create one
+
+
+db.students.insertOne({})
+db.students.insertMany([{},{}])
+db1> db.students.insertOne({"name":"adnan"})
+{
+  acknowledged: true,
+  insertedId: ObjectId('694bbd65ae7c1415b71e2621')
+}
+db1> db.students.insertOne({name:"adnan"})
+{
+  acknowledged: true,
+  insertedId: ObjectId('694bbd6dae7c1415b71e2622')
+}
+db1>
+
+in commandline its not neccessary for you to put double quotes on key value on double quotes on value is enough
+
+but in compass its neccessary
+you format button in compass to resolve errors
+
+
+
+this is to get all the documents from collection
+db.collectionName.find()
+
+
+database
+string
+integer without decimal
+double integer with decimal
+boolean(true or false)
+Date ( to create one new Date())
+Date ( to create one new Date("23-01-2002T00:00:45"))
+null
+array ["",""]
+nested documents {
+                    {  
+                        {
+
+                        }
+                    }
+                }
+
+
+this is how to sort things in mongoDB
+db.collectionName.find().sort(keyName:1)
+1 for ascending and -1 for desending
+1 for alpha -1 for reverse alpha order
+
+db.collectionName.find().limit(number)
+this will sort things by ObjectId
+
+now how to select a particular document using query and how to project only some specific details
+db.collectionName.find({query},{projection})
+db.collectionName.find(
+    {gpa:4.0,fulltime:true},
+    {name:1,keyValue:1}
+    )
+
+with find everytime you will get _id if you are not interested in that you have to specify explicitly
+
+db.collectionName.find({},{_id:-1,name:1})
+or
+db.collectionName.find(
+                        {},
+                        {
+                            _id:false,
+                            name:true
+                        }
+                    )
+
+im comapss you have query and projection at different place as input boxes
+
+//to update document
+db.collectionName.updateOne(
+    {filter},
+    {updation}
+)
+example
+db.collectionName.find(
+    {
+        name:"spongebob"
+    },
+    {
+        $set: { //what is does is nothing but it will update the field if its not there if its there then it will update that field
+                name:"bob,
+                age:45
+        }
+    }
+)
+
+//unset is used to remove a filed itself
+db,collectionName.updateOne(
+                            {query},
+                            {
+                                $unset:{
+                                    keyValue:""
+                                }
+                            })
+
+
+updateMany
+db.collectionName.updateMany(
+    {
+        keyvalue:here value 
+        or
+        keyvalue:{
+            $exists:false  if this field does not exist then
+        }
+    },
+    {
+        $set:{
+            keyvalue:value
+        }
+    }
+)
+
+how to delete documents
+db.collectionName.delete({query(key:value)})
+db.collectionName.deleteMany({query(key:value)})
+
+incase of delete or updateOne if the query matches multiple documents then one arbitary document will get deleted 
+
+no sorting nothing
+
+comparison operators
+$ne: not equal
+example
+db.collectionName.find({
+    name:{
+        $ne:"adnan"
+    }
+})
+
+$lt -less than
+$lte -less than equal
+$gt 
+$gte
+db1> db.students.find({age:{$gt:50}})
+db1> db.students.find({age:{$gt:50 , $lt:25}})
+the range is 25-50 now
+
+the range is 25-50 now
+db1> db.students.find({age:{$in[50,25]}})
+
+not in the range
+db1> db.students.find({age:{$nin[50,25]}})
+
+
+
+logical operators
+db.students.find({$and:[{
+    fulltime:true
+},{
+    age:{
+        $lte:50
+    }
+}]})
+
+similarly we have $or
+$nor where both conditions has to be falsed opposite of $and
+
+if you want to include null then use $not
+db.collectionName.find(
+    {
+        $age:{
+            $not:{
+                $gt:30
+            }
+        }
+    }
+)
+
+this will give all the documents where the condition is false and also those document where age is null
+
+
+indexes
+db.collectionName.find({query}).explain("executionStat")
+this will give all the steps taken in order to execute the query
+
+
+to craete indexe
+db.collectionName.createIndex({
+    keyValue:1 for asc and -1 for desc
+})
+
+db.collectionName.getIndexes()
+to get all the indexes
+
+db.collectionName.dropIndex("indexName")
+
+
+to view collection
+show collection
+db.collectionName.drop()

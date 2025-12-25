@@ -1,0 +1,256 @@
+//behind the scene
+aggregation gives the output as array
+
+
+if u have to find avg of smthg group it first
+
+$unwind 
+what it What it does is nothing but it will for example if a document has an array and the array has to value then it will create two documents having Separate value so it basically creates a copy of the document for all the field which has multiple values for example if a field has multiple values then what it does is It will create a copy of the document and the value of that field will be unique In such a way that the value of the field will be unique Example is given in the bottom after group
+
+//some concepts
+stages is nothing but the output of an aggregation pipeline
+[
+    {}, //stage1
+    {
+        $count:"name you want to give(lets say user)"
+        // output user:50
+    } //stage2
+]
+ex
+[
+  {
+    $match:{
+      isActive:true
+    }
+  },{
+    $count: 'ActiveUser'
+  }
+]
+{
+  "ActiveUser": 516
+}
+
+
+//lets learn bhow to groupm people
+[
+  {
+    $group: {
+      _id:"$gender", //here _id is mandatory and the next field is the key value to grp
+    	averageAge:{
+        $avg:"$age"
+      }
+    }
+  }
+]
+{
+  "_id": "male",
+  "averageAge": 29.851926977687626
+} ...
+
+here we have  group people based on geneder you can pass null there
+and make the entire thing as one document and perform your operations
+
+
+[
+  {
+    $group: {
+      _id: "$favoriteFruit",
+      noOfusers: { the syntax is that you have to create a new key thing after group if u want to proceed 
+        $sum: 1 //everytime you get a document having this value add one to that
+      }
+    }
+  },{
+
+    $sort: {
+      noOfusers: -1 sorting in descending order
+  },{
+    $limit: 5
+  }
+    }
+]
+acumulator are nothing but function which takes the document and makes them as one document or more
+
+$unwind
+example
+[
+  {
+    $unwind: {
+      path: "$tags"
+    }
+  },
+  {
+    $group: {
+      _id: "$tags",
+      noOfUser:{
+        $sum:1
+      }
+    }
+  },
+  {
+    $group: {
+      _id: null,
+      avg:{
+        $avg:"$noOfUser"
+      }
+    }
+  }
+  
+]
+
+
+[
+  {
+    $addFields: {
+      noOfTags: {
+        $size:{
+          $ifNull:[ "$tags" , []]  //this is important because you handling the null part if that filed is not present then treat it is an empty array
+        }
+      }
+    }
+  },
+  {
+    $group: {
+      _id: null,
+      avg:{
+        $avg:"$noOfTags"
+      }
+    }
+  }
+]
+
+
+$project and match
+[
+  {
+    $match:{
+      tags:"velit",
+      isActive:false
+    }
+  },
+  {
+    $project: {
+      name:1,
+      age:1,
+      _id:0
+    }
+  }
+]
+
+you cam also use regex in mongodb
+[
+  {
+    $match: {
+      "company.phone":/^\+1 \(940\)/
+    }
+  },
+  {
+    $count: 'string'
+  }
+]
+
+$push 
+it is used to add things in the array
+[
+  {
+    $group: {
+      _id: "$favoriteFruit",
+      userName:{
+        $push:"$name"
+      }
+    }
+  }
+]
+
+//how to drill down the array
+[
+  {
+    $match: {
+      "tags.1":"ad"
+    }
+  },{
+    $count: 'second tags as ad'
+  }
+]
+
+
+or condition either one of them
+[
+  {
+    $match: {
+      "tags":"ad",
+      "tags":"enim",
+    }
+  },{
+    $count: 'second tags as ad'
+  }
+]
+
+this is add both of them
+[
+  {
+    $match: {
+      tags: {
+        $all: ["enim", "id"]
+      }
+    }
+  },
+  {
+    $count: "second tags as ad"
+  }
+]
+
+finding all the companies in the USA and their users
+[
+  {
+    $match: {
+      "company.location.country":"USA"
+    }
+  },
+  {
+    $group: {
+      _id: "$company.title",
+      noOfUser: {
+        $sum: 1
+      }
+    }
+  }
+]
+
+
+
+[
+  {
+    $lookup: {
+      from: "authors",
+      localField: "author_id",
+      foreignField: "_id",
+      as: "result"
+    }
+  },
+  {
+    $addFields: {
+      result:{
+        $first: "$result"
+      }
+    }
+  }
+]
+
+another way
+[
+  {
+    $lookup: {
+      from: "authors",
+      localField: "author_id",
+      foreignField: "_id",
+      as: "result"
+    }
+  },
+  {
+    $addFields: {
+      result:{
+        $arrayElemAt:["$result",0]
+      }
+    }
+  }
+]
