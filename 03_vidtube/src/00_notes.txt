@@ -1,0 +1,98 @@
+mongodb allows bith prehooks and posthook
+
+prehooks things you want to do before saving something into database
+posthook after saving stuffs into the database
+
+//aggregation pipeline
+pipeline is just stages and each stage performs some operration on the input data
+and the output of each stage is the input of the next stage
+
+[
+    {pipeline1},
+    {pipeline2},
+    {pipeline3},
+]
+
+//now each pipeline
+{
+    $opration:{}
+}
+
+example join opration in mongodb
+{
+    $lookup:{
+        foreigndbname:"teacher"
+        localid:"Tid"
+        foreignId:"EmpID"
+        nameOftheConnection:"relation between stu and techaer"
+
+        //refer the docs for correct syntax
+    }
+}
+here you will get the output in array to convert it into objcet
+{
+    $addfield:{
+        "connection":{
+            $first:nameOftheConnection
+            }
+    }
+}
+
+//in mongodb the field represent something which has both key and value pair
+
+pipeline ontains operators [op1,op2]
+if you are using a variable from the document you have to mention $
+
+some functions are $sum,$min,$max,$avg
+
+format
+[
+    {
+        $function($group):{
+            name:{
+                $sum:"$age"
+            },
+            _id:"$age"
+        }
+    }
+]
+
+you can also use limit to limit the number of respose you get
+and since limit is a function you have at add $
+
+syntax $function, "$variable"
+
+you can also use $skip to skip the number of documents you want to skip and it will skip from the first
+
+limit and skip is used in displaying pages in serach results
+$unwind is used to expand the docs based on value
+
+ex adnan:{
+    language :[urdu,english]
+}
+
+$unwind:"$language"
+
+output
+ex adnan:{
+    language :urdu
+}
+ex adnan:{
+    language :english
+}
+
+
+$match:{
+    language: /^c/
+}
+
+starts with c
+
+//whatever may be the case you will get id = objectId(string)
+
+$project:{
+    newName:"$varibale"
+}
+
+constraint 
+100 mb limit
