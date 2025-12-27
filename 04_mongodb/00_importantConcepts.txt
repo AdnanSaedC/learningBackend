@@ -1,6 +1,14 @@
 //behind the scene
 aggregation gives the output as array
 
+mongodb save bson data not json
+json in binary plus some additional features
+bson = json +some data
+
+it is not neccessary to use double qouts in the key field 
+for vlaue its important
+
+you can provide a unique id its not neccessary that only mongo can
 
 if u have to find avg of smthg group it first
 

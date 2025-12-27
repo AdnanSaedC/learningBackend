@@ -1,0 +1,35 @@
+it is nothing but sharing of data between two opertaing systems
+
+URL is the location
+URI is the identifier
+URN is the name nothing else
+
+headers are used for authentications(access and refreshtoken) stateMangament user is logged in or not
+
+req header , res header, rep header (it  all about the form of data), data header(actual data)
+
+most common header
+application/json
+
+user-agnet this is to find who is sending the data it is mobile or browser or what
+content-type which type of documnet
+cache control after how many time the data has to be deleted
+
+some HTTP methods(opeartions)
+get to get mesg
+head no body only headers
+options what are the operations available on this endpoint
+trace it is used to get the path of from where the data os going and coming what rae the hops are there in between
+delete
+put to replace
+patch only a part of resource gets modified
+post adding a resource
+
+
+
+status code
+1xx informations passing to the client
+2xx success code
+3xx redirection
+4xx user made a mistake
+5xx server error
